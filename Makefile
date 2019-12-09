@@ -1,6 +1,6 @@
 .PHONY : container 
 
-TAG:=`git rev-parse --short HEAD`
+TAG ?= `git rev-parse --short HEAD`
 
 all: container
 
