@@ -6,6 +6,10 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 )
+const (
+	XRealIP       = "X-Real-IP"
+	XForwardedFor = "X-Forwarded-For"
+)
 
 var (
 	listenPort int
@@ -27,6 +31,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc(routePath, func (w http.ResponseWriter, r *http.Request) {
+		printRemoteIP(r)
 		fmt.Println(respMsg)
 		w.Write([]byte(respMsg))
 	})
@@ -36,4 +41,18 @@ func main() {
 	fmt.Println("exiting...")
 }
 
+func printRemoteIP(req *http.Request) {
+	fmt.Printf("req.RemoteAddr = %s\n", req.RemoteAddr)
+	if realIP := req.Header.Get(XRealIP); realIP != "" {
+		fmt.Printf("req.Header.Get(%s) = %s\n", XRealIP, realIP)
+	} else {
+		fmt.Printf("req.Header.Get(%s) not found\n", XRealIP)
+	}
+	
+	if forwardIP := req.Header.Get(XForwardedFor); forwardIP != "" {
+		fmt.Printf("req.Header.Get(%s) = %s\n", XForwardedFor, forwardIP)
+	} else {
+		fmt.Printf("req.Header.Get(%s) not found\n", XForwardedFor)
+	}
+}
 
